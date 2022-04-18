@@ -4,7 +4,7 @@
   "private": true,
   "homepage": "https://geolonia.github.io/osm-address-normalize",
   "dependencies": {
-    "@geolonia/normalize-japanese-addresses": "^2.3.5",
+    "@geolonia/normalize-japanese-addresses": "^2.5.6",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
