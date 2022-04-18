@@ -1,10 +1,10 @@
-import { NormalizeResult } from '@geolonia/normalize-japanese-addresses';
+import { normalize, NormalizeResult } from '@geolonia/normalize-japanese-addresses';
 
 export interface OsmAddress {
   /** 日本の場合は `JP` に固定 */
   'addr:country'?: string
   /** 都道府県 */
-  'addr:province'?: string  
+  'addr:province'?: string
   /** 〇〇郡 */
   'addr:county'?: string
   /** 〇〇市町村 */
@@ -88,4 +88,45 @@ export const nja2osm: (input: NormalizeResult) => OsmAddress = (input) => {
   }
 
   return output;
+};
+
+export interface FeatureCollection {
+  type: "FeatureCollection",
+  features: Feature[]
+}
+
+export interface Feature {
+  type: "Feature",
+  properties: OsmAddress,
+  geometry: {
+    type: "Point",
+    coordinates: number[]
+  }
+}
+
+export const addresses2geojson = async (addresses: string[]): Promise<FeatureCollection> => {
+  const geojson: FeatureCollection = {
+    type: "FeatureCollection",
+    features: []
+  };
+  for (let address of addresses) {
+    const feature: Feature = {
+      type: "Feature",
+      properties: {},
+      geometry: {
+        type: "Point",
+        coordinates: []
+      }
+    };
+    const normalizeResult = await normalize(address);
+    if (normalizeResult.lat !== null && normalizeResult.lng !== null) {
+      feature.properties = nja2osm(normalizeResult);
+      feature.geometry.coordinates = [
+        normalizeResult.lng,
+        normalizeResult.lat
+      ];
+    }
+    geojson.features.push(feature);
+  };
+  return geojson;
 };
